@@ -72,24 +72,31 @@ impl Universe {
     pub fn tick(&mut self) {
         let _timer = Timer::new("Universe::tick");
 
-        let mut next = self.cells.clone();
+        // let mut next = self.cells.clone();
+        let mut next = {
+            self.cells.clone()
+        };
 
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let idx = self.get_index(row, col);
-                let cell = self.cells[idx];
-                let live_neighbors = self.live_neighbor_count(row, col);
+        {
+            let _timer = Timer::new("new generation");
+            for row in 0..self.height {
+                for col in 0..self.width {
+                    let idx = self.get_index(row, col);
+                    let cell = self.cells[idx];
+                    let live_neighbors = self.live_neighbor_count(row, col);
 
-                next.set(idx, match (cell, live_neighbors) {
-                    (true, x) if x < 2 => false,
-                    (true, 2) | (true, 3) => true,
-                    (true, x) if x > 3 => false,
-                    (false, 3) => true,
-                    (otherwise, _) => otherwise
-                });
+                    next.set(idx, match (cell, live_neighbors) {
+                        (true, x) if x < 2 => false,
+                        (true, 2) | (true, 3) => true,
+                        (true, x) if x > 3 => false,
+                        (false, 3) => true,
+                        (otherwise, _) => otherwise
+                    });
+                }
             }
         }
 
+        let _timer = Timer::new("free old cells");
         self.cells = next;
     }
 
